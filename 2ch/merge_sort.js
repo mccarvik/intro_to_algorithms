@@ -17,8 +17,11 @@ function merge(A, p, q, r) {
             j++;
         }
     }
+}
+
+function merge_sort(A, p, r) {
     
 }
 
 arr = [2, 4, 5, 7, 1, 2, 3, 6]
-console.log(merge())
+console.log(merge_sort(arr, 0, arr.length))
