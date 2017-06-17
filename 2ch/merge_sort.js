@@ -20,8 +20,14 @@ function merge(A, p, q, r) {
 }
 
 function merge_sort(A, p, r) {
-    
+    if (p < r) {
+        var q = Math.floor((p+r)/2);
+        merge_sort(A, p, q);
+        merge_sort(A, q+1, r);
+        merge(A, p, q, r);
+    }
+    return A;
 }
 
-arr = [2, 4, 5, 7, 1, 2, 3, 6]
+var arr = [5, 2, 4, 7, 1, 3, 2, 6];
 console.log(merge_sort(arr, 0, arr.length))
