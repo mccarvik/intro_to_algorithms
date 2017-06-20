@@ -1,0 +1,17 @@
+Big-O --> asymptotic upper bound of the function (worst-case running time)
+Big-Theta --> if f(n) is a member of Big-Theta(n) it is also a member of O(n)
+Big-Omega --> asymptotic lower bound (best-case running time)
+
+little-o --> Big-O is asymptotically tight, little-o is not, for example:
+    n = O(n)
+    n = o(n**2) nad n != o(n)
+
+little-omgea --> Big-Omega is asymptotically tight, little-omega is not:
+    n**2/2 = ω(n), but n**2/2 != ω(n**2)
+
+Comparisons:
+f (n) = O(g(n)) --> a ≤ b ,
+f (n) = big-Omega(g(n)) --> a ≥ b ,
+f (n) = big-Theta(g(n)) --> a = b ,
+f (n) = o(g(n)) --> a < b ,
+f (n) = ω(g(n)) --> a > b .
