@@ -39,6 +39,21 @@ function compare(a, b){
     else { return -1; }
 }
 
+// Randomization function
+// randomly selects indices to reconstruct the list
+function randomize_in_place(arr) {
+    var ret_arr = [];
+    
+    while (arr.length > 0) {
+        var i = parseInt(Math.random() * arr.length);
+        ret_arr.push(arr[i]);
+        arr.splice(i, 1);
+    }
+    return ret_arr
+}
+
+
+
 function rand_list(len, min, max) {
     var ret = [];
     var i = 0;
@@ -53,9 +68,12 @@ function rand_list(len, min, max) {
 }
 
 var list = rand_list(10,0,10);
-// console.log(list);
-list = permute_by_sorting(list)
-console.log(hire_assistant(list));
+// list = permute_by_sorting(list)
+// console.log(hire_assistant(list));
+
+console.log(list);
+var new_list = randomize_in_place(list)
+console.log(new_list);
 
 // Each interviewee has 1/i chance of being better than the candidates before them
 // On average we hire Sigma : 1/ i, for 1 to i-1, 
