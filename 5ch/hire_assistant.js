@@ -15,15 +15,36 @@ function hire_assistant(arr) {
     return cost;
 }
 
+function on_line_hire_assistant(k, arr) {
+    var best = -1;
+    var best_ind = -1;
+    for (var i=0; i < k; i++) {
+        if (arr[i] > best) { 
+            best = arr[i];
+            best_ind = i;
+        }
+    }
+    
+    for (var i=k; i < arr.length; i++) {
+        if (arr[i] > best) {
+            return i;
+        }
+    }
+    
+    // If best candidate was between 1 and k, we hire the last candidate
+    return arr.length - 1;
+}
+
 // Each interviewee has 1/i chance of being better than the candidates before them
 // On average we hire Sigma : 1/ i, for 1 to i-1, 
 // = ln(n) hires
 
-var list = rand_funcs.rand_list(10,0,10);
-console.log(hire_assistant(list));
-
-
+var list = rand_funcs.rand_list(20,0,100);
+// console.log(hire_assistant(list));
 console.log(list);
-var new_list = rand_funcs.randomize_in_place(list)
-console.log(new_list);
+var ind = on_line_hire_assistant(6, list);
+console.log(ind);
+console.log(list[ind]);
+
+
 
