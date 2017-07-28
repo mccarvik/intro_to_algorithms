@@ -11,6 +11,7 @@ function count_sort(A, k) {
         C[i] = C[i] + C[i-1];
     }
     
+    console.log(C);
     for (var j=A.length; j > -1 ; j--) {
         B[C[A[j]]] = A[j];
         C[A[j]]--;
