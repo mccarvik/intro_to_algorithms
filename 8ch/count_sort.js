@@ -26,6 +26,19 @@ function count_sort(A, k) {
     return B;
 }
 
+function bubble_sort(A) {
+    for (var i=0; i < A.length; i++) {
+        for (var j=A.length; j > i; j--) {
+            if (A[j] < A[j-1]) {
+                var holder = A[j];
+                A[j] = A[j-1];
+                A[j-1] = holder;
+            }
+        }
+    }
+    return A;
+}
+
 var list = rand_funcs.rand_list(10,0,15);
 console.log(list);
 console.log(count_sort(list, Math.max.apply(Math, list)));

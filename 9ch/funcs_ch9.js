@@ -59,9 +59,44 @@ function partition(A, p, r) {
     return i + 1;
 }
 
+function select(A, i) {
+    if (A.length === 1) {
+        return A[0];
+    }
+    
+    var B = [];
+    for (var j=0; j+5<A.length; j=j+5) {
+        B.push(A.slice(j,j+5));
+    }
+    B.push(A.slice(j));
+    console.log(B);
+    
+    var meds = [];
+    for (var j=0; j<B.length; j++) {
+        B[i] = bubble_sort(B[i]);
+        meds.push(B[i][2]);
+    }
+    
+    // var med = bubble_sort(meds)[(meds.length-1)/2];
+    
+}
 
 
-var list = rand_funcs.rand_list(20,10,99);
+function bubble_sort(A) {
+    for (var i=0; i < A.length; i++) {
+        for (var j=A.length; j > i; j--) {
+            if (A[j] < A[j-1]) {
+                var holder = A[j];
+                A[j] = A[j-1];
+                A[j-1] = holder;
+            }
+        }
+    }
+    return A;
+}
+
+var list = rand_funcs.rand_list(25,10,99);
 console.log('Original List: ' + list);
-console.log(minmax(list));
-console.log(randomized_select(list, 0, 20, 2))
+// console.log(minmax(list));
+// console.log(randomized_select(list, 0, 20, 2))
+console.log(select(list, 3))
