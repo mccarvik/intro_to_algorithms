@@ -51,3 +51,16 @@ exports.rand_list = function (len, min, max) {
     }
     return ret;
 }
+
+exports.rand_float_list = function (len, min, max) {
+    var ret = [];
+    var i = 0;
+    while (i < len) {
+        var val = (Math.random() * (max-min) + min);
+        if (ret.indexOf(val) === -1) {
+            ret.push(val);
+            i++;
+        }
+    }
+    return ret;
+}
