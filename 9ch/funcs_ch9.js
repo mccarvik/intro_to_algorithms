@@ -16,7 +16,6 @@ function minmax(A) {
     return [mn, mx];
 }
 
-
 function randomized_select(A, p, r, i) {
     if (p==r) {
         return A[p];
@@ -73,12 +72,26 @@ function select(A, i) {
     
     var meds = [];
     for (var j=0; j<B.length; j++) {
-        B[i] = bubble_sort(B[i]);
-        meds.push(B[i][2]);
+        B[j] = bubble_sort(B[j]);
+        meds.push(B[j][2]);
     }
     
-    // var med = bubble_sort(meds)[(meds.length-1)/2];
     
+    if (meds.length == 1) {
+        // median of median
+        var x = meds[0];
+    } else {
+        return select(meds);
+    }
+    
+    var k = partition(A, x, A.length-1);
+    if (i == k) {
+        return x;
+    } else if (i < k) {
+        return select(A.slice(0,k), i);
+    } else {
+        return select(A.slice(0,k), i-k);
+    }
 }
 
 
