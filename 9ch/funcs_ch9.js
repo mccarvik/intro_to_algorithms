@@ -59,7 +59,14 @@ function partition(A, p, r) {
 }
 
 function select(A, i) {
+    // make sure item is a list in case its just a 1-element slice
+    A = [].concat(A);
+    
     var med_of_meds = getMedOfMeds(A);
+    if (med_of_meds == null) {
+        return;
+    }
+    
     console.log("med of meds: " + med_of_meds);
     
     // get ind of med_of_meds
@@ -83,17 +90,12 @@ function select(A, i) {
     new_A = new_A.slice(1,new_A.length);
     console.log("new A:" + new_A);
     
-    if (k === 0) {
-        console.log("here2");
-    }
-    
-    if (i === k) {
+    if (i === k || A.length===1) {
         return A[k];
     } else if (i < k) {
         return select(A.slice(0,k), i);
     } else {
-        console.log("here:" + A.slice(k,A.length));
-        return select(A.slice(k,A.length), i-k);
+        return select(A.slice(k+1), i-k);
     }
 }
 
@@ -123,6 +125,7 @@ function getMedOfMeds(A, i) {
 function getMedian(list) {
     // By convention, take the lower median
     var mid = Math.floor((list.length-1) / 2);
+    console.log("mid: " + mid + " val: " + list[mid] + " list: " + list);
     return list[mid];
 }
 
@@ -143,4 +146,4 @@ var list = rand_funcs.rand_list(25,10,99);
 console.log('Original List: ' + list);
 // console.log(minmax(list));
 // console.log(randomized_select(list, 0, 20, 2))
-console.log(select(list, 3))
+console.log("Final Answer: " + select(list, 24))
