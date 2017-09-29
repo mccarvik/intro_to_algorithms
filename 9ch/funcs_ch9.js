@@ -55,10 +55,50 @@ function partition(A, p, r) {
     temp = A[i+1];
     A[i+1] = A[r];
     A[r] = temp;
-    return i + 1;
+    return [i + 1, A];
 }
 
 function select(A, i) {
+    var med_of_meds = getMedOfMeds(A);
+    console.log("med of meds: " + med_of_meds);
+    
+    // get ind of med_of_meds
+    var ind;
+    for (var j=0; j<A.length; j++) {
+        if (A[j] === med_of_meds) {
+            ind = j;
+            break;
+        }
+    }
+    
+    // put pivot in the back
+    var temp = A[A.length-1];
+    A[A.length-1] = A[ind];
+    A[ind] = temp;
+    
+    var new_A = partition(A, 0, A.length-1);
+    var k = new_A[0];
+    console.log("k: " + k);
+    console.log("i: " + i);
+    new_A = new_A.slice(1,new_A.length);
+    console.log("new A:" + new_A);
+    
+    if (k === 0) {
+        console.log("here2");
+    }
+    
+    if (i === k) {
+        return A[k];
+    } else if (i < k) {
+        return select(A.slice(0,k), i);
+    } else {
+        console.log("here:" + A.slice(k,A.length));
+        return select(A.slice(k,A.length), i-k);
+    }
+}
+
+function getMedOfMeds(A, i) {
+    // base case, will solve step 3 --> find median of medians
     if (A.length === 1) {
         return A[0];
     }
@@ -70,30 +110,21 @@ function select(A, i) {
     B.push(A.slice(j));
     console.log(B);
     
+    // Step 2 find all medians
     var meds = [];
     for (var j=0; j<B.length; j++) {
         B[j] = bubble_sort(B[j]);
-        meds.push(B[j][2]);
+        meds.push(getMedian(B[j]));
     }
     
-    
-    if (meds.length == 1) {
-        // median of median
-        var x = meds[0];
-    } else {
-        return select(meds);
-    }
-    
-    var k = partition(A, x, A.length-1);
-    if (i == k) {
-        return x;
-    } else if (i < k) {
-        return select(A.slice(0,k), i);
-    } else {
-        return select(A.slice(0,k), i-k);
-    }
+    return getMedOfMeds(meds, i);
 }
 
+function getMedian(list) {
+    // By convention, take the lower median
+    var mid = Math.floor((list.length-1) / 2);
+    return list[mid];
+}
 
 function bubble_sort(A) {
     for (var i=0; i < A.length; i++) {
