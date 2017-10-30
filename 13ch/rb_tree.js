@@ -238,16 +238,22 @@ function del(tree, z) {
     
     if (x !== undefined) {
         x.setParent(y.parent());
+    } else {
+        // x = new Tree(undefined, undefined, undefined, y.parent());
     }
     
+    console.log(y.getData() + "  " + y.color());
     if (y.parent() !== undefined) {
         if (y === y.parent().left()) {
             y.parent().setLeft(x);
         } else {
             y.parent().setRight(x);
         }
+    } else {
+        tree = x;
     }
     
+    console.log(z.getData() + "  " + z.color());
     if (y !== z) {
         z.setData(y.getData());
     }
@@ -371,7 +377,7 @@ root = insert(root, new Tree(2));
 root = insert(root, new Tree(11));
 levelOrder(root)
 
-root = del(root, 7);
+root = del(root, 3);
 levelOrder(root)
 
 console.log();
