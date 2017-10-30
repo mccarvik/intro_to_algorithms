@@ -50,20 +50,41 @@ function Tree( d, l, r, p, c )
 
 }
 
+function levelOrder(root) {
+  if (!root) return [];
+  var array = [];
+  search(root, 1);
+
+  function search(root, level) {
+    if (root) {
+      if (array.length < level) {
+        array.push([]);
+      }
+      var arr = array[level - 1];
+      arr.push(root.getData() + root.color());
+      search(root.left(), level + 1);
+      search(root.right(), level + 1);
+    } else {
+      return;
+    }
+  }
+
+  console.log(array);
+};
 
 function inorder(tree) {
     if (tree !== undefined) {
         inorder(tree.left());
-        process.stdout.write(tree.getData() + " ");
+        process.stdout.write(tree.getData() + tree.color() + " ");
         inorder(tree.right());
     }
 }
 
 function preorder(tree) {
     if (tree !== undefined) {
-        process.stdout.write(tree.getData() + " ");
-        inorder(tree.left());
-        inorder(tree.right());
+        process.stdout.write(tree.getData() + tree.color() + " ");
+        preorder(tree.left());
+        preorder(tree.right());
     }
 };
 
@@ -101,8 +122,6 @@ function maximum(tree) {
     return tree;
 };
 
-// Edited functions for red-black functionality
-
 function successor(tree) {
     if (tree.right() !== undefined) {
         return minimum(tree.right());
@@ -129,6 +148,52 @@ function predecessor(tree) {
     }
 }
 
+// Edited functions for red-black functionality
+
+function left_rotate(tree, x) {
+    var y = x.right();
+    x.setRight(y.left());
+    if (y.left() !== undefined) {
+        y.left().setParent(x);
+    }
+    
+    y.setParent(x.parent());
+    if (x.parent() === undefined) {
+        tree = y; // tree was empty
+    } else {
+        if (x === x.parent().left()) {
+            x.parent().setLeft(y);
+        } else {
+            x.parent().setRight(y);
+        }
+    }
+    y.setLeft(x);
+    x.setParent(y);
+    return tree;
+};
+
+function right_rotate(tree, x) {
+    var y = x.left();
+    x.setLeft(y.right());
+    if (y.right() !== undefined) {
+        y.right().setParent(x);
+    }
+    
+    y.setParent(x.parent());
+    if (x.parent() === undefined) {
+        tree = y; // tree was empty
+    } else {
+        if (x === x.parent().right()) {
+            x.parent().setRight(y);
+        } else {
+            x.parent().setLeft(y);
+        }
+    }
+    y.setRight(x);
+    x.setParent(y);
+    return tree;
+};
+
 function insert(tree, z) {
     var y = undefined;
     var x = tree;
@@ -150,9 +215,14 @@ function insert(tree, z) {
             y.setRight(z);
         }
     }
+    
+    z.setColor('r');
+    tree = insert_fixup(tree, z);
+    return tree;
 }
 
 function del(tree, z) {
+    z = search(tree, z);
     var y, x;
     if (z.left() === undefined || z.right() === undefined) {
         y = z;
@@ -160,10 +230,10 @@ function del(tree, z) {
         y = successor(z);
     }
     
-    if (z.left() !== undefined) {
-        x = z.left();
+    if (y.left() !== undefined) {
+        x = y.left();
     } else {
-        x = z.right();
+        x = y.right();
     }
     
     if (x !== undefined) {
@@ -181,16 +251,127 @@ function del(tree, z) {
     if (y !== z) {
         z.setData(y.getData());
     }
+    
+    if (y.color() === 'b') {
+        console.log(x.getData() + "  " + x.color());
+        tree = delete_fixup(tree, x);
+    }
+    
+    return tree;
+}
+
+function insert_fixup(tree, z) {
+    while (z.parent() !== undefined && z.parent().parent() !== undefined && z.parent().color() === 'r' ) {
+        if (z.parent() === z.parent().parent().left()) {
+            var y = z.parent().parent().right();
+            if (y !== undefined && y.color() === 'r') {
+                z.parent().setColor('b');
+                y.setColor('b');
+                z.parent().parent().setColor('r');
+                z = z.parent().parent();
+            } else {
+                if (z.parent().right() === z) {
+                    z = z.parent();
+                    tree = left_rotate(tree, z);
+                }
+                z.parent().setColor('b');
+                z.parent().parent().setColor('r');
+                tree = right_rotate(tree, z.parent().parent());
+            }
+        } else if (z.parent() === z.parent().parent().right()) {
+            var y = z.parent().parent().left();
+            if (y !== undefined && y.color() === 'r') {
+                z.parent().setColor('b');
+                y.setColor('b');
+                z.parent().parent().setColor('r');
+                z = z.parent().parent();
+            } else {
+                if (z.parent().left() === z) {
+                    z = z.parent();
+                    tree = right_rotate(tree, z);
+                }
+                z.parent().setColor('b');
+                z.parent().parent().setColor('r');
+                tree = left_rotate(tree, z.parent().parent());
+            }
+        }
+    }
+    tree.setColor('b')
+    return tree;
+}
+
+function delete_fixup(tree, x) {
+    while (x.color() === 'b' && x !== tree) {
+        if (x === x.parent().left()) {
+            var w = x.parent().right()
+            if (w.color() === 'r') {
+                w.setColor('b');
+                x.parent().setColor('r');
+                tree = left_rotate(tree, x.parent());
+                w = x.parent().right();
+            }
+            
+            if (w.left().color() === 'b' && w.right().color() === 'b') {
+                w.setColor('r');
+                x = x.parent();
+            } else {
+                if (w.right().color() === 'b') {
+                    w.setColor('r');
+                    tree = right_rotate(tree, w);
+                    w = x.parent().right();
+                }
+                
+                w.setColor(x.parent().color());
+                x.parent().setColor('b');
+                w.right().setColor('b');
+                tree = left_rotate(tree, x.parent());
+                x = tree;
+            }
+        } else {
+            var w = x.parent().left()
+            if (w.color() === 'r') {
+                w.setColor('b');
+                x.parent().setColor('r');
+                tree = right_rotate(tree, x.parent());
+                w = x.parent().left();
+            }
+            
+            if (w.right().color() === 'b' && w.left().color() === 'b') {
+                w.setColor('r');
+                x = x.parent();
+            } else {
+                if (w.left().color() === 'b') {
+                    w.setColor('r');
+                    tree = left_rotate(tree, w);
+                    w = x.parent().left();
+                }
+                
+                w.setColor(x.parent().color());
+                x.parent().setColor('b');
+                w.left().setColor('b');
+                tree = right_rotate(tree, x.parent());
+                x = tree;
+            }
+        }
+    }
+    x.setColor('b');
+    return tree;
 }
 
 
-var root = new Tree(5, undefined, undefined, undefined, 'b');
-insert(root, new Tree(3));
-insert(root, new Tree(7));
-insert(root, new Tree(4));
-insert(root, new Tree(1));
-insert(root, new Tree(9));
-insert(root, new Tree(8));
+var root = new Tree(1, undefined, undefined, undefined, 'b');
+root = insert(root, new Tree(3));
+root = insert(root, new Tree(7));
+root = insert(root, new Tree(4));
+root = insert(root, new Tree(9));
+root = insert(root, new Tree(6));
+root = insert(root, new Tree(8));
+root = insert(root, new Tree(14));
+root = insert(root, new Tree(2));
+root = insert(root, new Tree(11));
+levelOrder(root)
 
-inorder(root);
+root = del(root, 7);
+levelOrder(root)
+
 console.log();

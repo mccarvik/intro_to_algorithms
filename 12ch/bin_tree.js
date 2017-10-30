@@ -156,10 +156,10 @@ function del(tree, z) {
         y = successor(z);
     }
     
-    if (z.left() !== undefined) {
-        x = z.left();
+    if (y.left() !== undefined) {
+        x = y.left();
     } else {
-        x = z.right();
+        x = y.right();
     }
     
     if (x !== undefined) {
@@ -177,6 +177,7 @@ function del(tree, z) {
     if (y !== z) {
         z.setData(y.getData());
     }
+    return y;
 }
 
 var root = new Tree(5, undefined, undefined, undefined);
