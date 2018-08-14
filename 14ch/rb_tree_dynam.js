@@ -1,5 +1,5 @@
-function Tree( d, l, r, p, c ) {   
-    // privite data 
+function Tree( d, l, r, p, c) {   
+    // private data 
     var data = d;
     var par = p;
     var leftChild ; 
@@ -15,7 +15,14 @@ function Tree( d, l, r, p, c ) {
         rightChild = new Tree(undefined, undefined, undefined, this, 'b');
     }
     var color = c;
-    var size = 1;
+    var size;
+    
+    // Need this so sentinel nodes have size 0
+    if (data !== undefined) {
+        size = 1;
+    } else {
+        size = 0;
+    }
 
     // public functions 
     this.getData = function() {
@@ -58,7 +65,7 @@ function Tree( d, l, r, p, c ) {
         color = c;
     };
     
-    this.size = function() {
+    this.getSize = function() {
         return size;
     }
     
@@ -67,6 +74,7 @@ function Tree( d, l, r, p, c ) {
     }
 
 }
+
 
 function levelOrder(root) {
   if (!root) return [];
@@ -80,9 +88,9 @@ function levelOrder(root) {
       }
       var arr = array[level - 1];
       if (root.getData() !== undefined) {
-        arr.push(root.getData() + root.color());
+        arr.push(root.getData() + root.color() + root.getSize());
       } else {
-        arr.push("X" + root.color());  
+        arr.push("X" + root.color() + 0);  
       }
       search(root.left(), level + 1);
       search(root.right(), level + 1);
@@ -94,6 +102,7 @@ function levelOrder(root) {
   console.log(array);
 };
 
+
 function inorder(tree) {
     if (tree.getData() !== undefined) {
         inorder(tree.left());
@@ -101,6 +110,7 @@ function inorder(tree) {
         inorder(tree.right());
     }
 }
+
 
 function preorder(tree) {
     if (tree.getData() !== undefined) {
@@ -110,6 +120,7 @@ function preorder(tree) {
     }
 };
 
+
 function postorder(tree) {
     if (tree.getData() !== undefined) {
         inorder(tree.left());
@@ -117,6 +128,7 @@ function postorder(tree) {
         process.stdout.write(tree.getData() + " ");
     }
 };
+
 
 function search(tree, k) {
     if (tree.getData() === undefined || tree.getData() === k) {
@@ -130,6 +142,7 @@ function search(tree, k) {
     }
 };
 
+
 function minimum(tree) {
     while (tree.left().getData() !== undefined) {
         tree = tree.left();
@@ -137,12 +150,14 @@ function minimum(tree) {
     return tree;
 };
 
+
 function maximum(tree) {
     while (tree.right().getData() !== undefined) {
         tree = tree.right();
     }
     return tree;
 };
+
 
 function successor(tree) {
     if (tree.right().getData() !== undefined) {
@@ -157,6 +172,7 @@ function successor(tree) {
     }
 }
 
+
 function predecessor(tree) {
     if (tree.left().getData() !== undefined) {
         return maximum(tree.left());
@@ -170,8 +186,8 @@ function predecessor(tree) {
     }
 }
 
-// Edited functions for red-black functionality
 
+// Edited functions for red-black functionality
 function left_rotate(tree, x) {
     var y = x.right();
     x.setRight(y.left());
@@ -191,8 +207,11 @@ function left_rotate(tree, x) {
     }
     y.setLeft(x);
     x.setParent(y);
+    y.setSize(x.getSize());
+    x.setSize(x.left().getSize() + x.right().getSize() + 1)
     return tree;
 };
+
 
 function right_rotate(tree, x) {
     var y = x.left();
@@ -213,13 +232,17 @@ function right_rotate(tree, x) {
     }
     y.setRight(x);
     x.setParent(y);
+    y.setSize(x.getSize());
+    x.setSize(x.left().getSize() + x.right().getSize() + 1)
     return tree;
 };
+
 
 function insert(tree, z) {
     var y = undefined;
     var x = tree;
     while (x.getData() !== undefined) {
+        x.setSize(x.getSize() + 1);
         y = x;
         if (z.getData() < x.getData()) {
             x = x.left();
@@ -243,13 +266,29 @@ function insert(tree, z) {
     return tree;
 }
 
+
 function del(tree, z) {
     z = search(tree, z);
+    
+    // decrease sizes up the tree
+    var ss = z;
+    while (ss !== undefined) {
+        ss.setSize(ss.getSize() - 1);
+        // console.log(ss.getData() + "   " + ss.getSize() + " dec up tree");
+        ss = ss.parent();
+    }
+    
     var y, x;
     if (z.left().getData() === undefined || z.right().getData() === undefined) {
         y = z;
     } else {
         y = successor(z);
+        // Need to do this to maintain size values
+        var y_t = y;
+        while (y_t !== z) {
+            y_t.setSize(y_t.getSize() - 1);
+            y_t = y_t.parent();
+        }
     }
     
     if (y.left().getData() !== undefined) {
@@ -264,6 +303,7 @@ function del(tree, z) {
         x = new Tree(undefined, undefined, undefined, y.parent(), 'b');
     }
     
+    
     if (y.parent().getData() !== undefined) {
         if (y === y.parent().left()) {
             y.parent().setLeft(x);
@@ -274,7 +314,6 @@ function del(tree, z) {
         tree = x;
     }
     
-    console.log(z.getData() + "  " + z.color());
     if (y !== z) {
         z.setData(y.getData());
     }
@@ -285,6 +324,7 @@ function del(tree, z) {
     
     return tree;
 }
+
 
 function insert_fixup(tree, z) {
     while (z.parent() !== undefined && z.parent().parent() !== undefined && z.parent().color() === 'r' ) {
@@ -326,9 +366,9 @@ function insert_fixup(tree, z) {
     return tree;
 }
 
+
 function delete_fixup(tree, x) {
     while (x.color() === 'b' && x !== tree) {
-        console.log(x.getData() + "  " + x.color());
         if (x === x.parent().left()) {
             var w = x.parent().right()
             if (w.color() === 'r') {
@@ -385,6 +425,7 @@ function delete_fixup(tree, x) {
     return tree;
 }
 
+
 function os_select(tree, i) {
     var r = tree.left.getSize() + 1;
     // check if this is the index we are looking for
@@ -398,6 +439,7 @@ function os_select(tree, i) {
         return os_select(tree.right, i - r);
     }
 }
+
 
 function os_rank(node, x, root) {
     // rank originally set to all nodes to the left of node + 1
@@ -427,7 +469,7 @@ root = insert(root, new Tree(2));
 root = insert(root, new Tree(11));
 levelOrder(root)
 
-root = del(root, 7);
+root = del(root, 14); // error with 7 and 9
 levelOrder(root)
 
 console.log();
