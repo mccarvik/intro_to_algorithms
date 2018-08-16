@@ -18,7 +18,10 @@ function Tree( d, l, r, p, c) {
     var size;
     
     // Need this so sentinel nodes have size 0
-    if (data !== undefined) {
+    if (Array.isArray(data)) {
+        size = Math.max.apply(null, data);
+    }
+    else if (data !== undefined) {
         size = 1;
     } else {
         size = 0;
@@ -221,7 +224,7 @@ function right_rotate(tree, x) {
     }
     
     y.setParent(x.parent());
-    if (x.parent().getData() === undefined) {
+    if (x.parent() === undefined) {
         tree = y; // tree was empty
     } else {
         if (x === x.parent().right()) {
@@ -255,6 +258,36 @@ function insert(tree, z) {
         tree = z; // tree was empty
     } else {
         if (z.getData() < y.getData()) {
+            y.setLeft(z);
+        } else {
+            y.setRight(z);
+        }
+    }
+    
+    z.setColor('r');
+    // levelOrder(tree);
+    tree = insert_fixup(tree, z);
+    return tree;
+}
+
+
+function insert_int(tree, z) {
+    var y = undefined;
+    var x = tree;
+    while (x.getData() !== undefined) {
+        x.setSize(Math.max.apply(null, [x.getSize(), x.left().getSize(), x.right().getSize()]));
+        y = x;
+        if (Math.min.apply(null, z.getData()) < Math.min.apply(null, x.getData())) {
+            x = x.left();
+        } else {
+            x = x.right();
+        }
+    }
+    z.setParent(y);
+    if (y.getData() === undefined) {
+        tree = z; // tree was empty
+    } else {
+        if (Math.min.apply(null, z.getData()) < Math.min.apply(null, y.getData())) {
             y.setLeft(z);
         } else {
             y.setRight(z);
@@ -427,23 +460,23 @@ function delete_fixup(tree, x) {
 
 
 function os_select(tree, i) {
-    var r = tree.left.getSize() + 1;
+    var r = tree.left().getSize() + 1;
     // check if this is the index we are looking for
     if (i === r) {
         return tree;
     } else if (i < r) {
         // if index is less than r, check the left tree
-        return os_select(tree.left, i);
+        return os_select(tree.left(), i);
     } else {
         // if index is more than r, check the right tree
-        return os_select(tree.right, i - r);
+        return os_select(tree.right(), i - r);
     }
 }
 
 
 function os_rank(node, x, root) {
     // rank originally set to all nodes to the left of node + 1
-    var r = node.left.getSize() + 1;
+    var r = node.left().getSize() + 1;
     var y = x;
     while (y != root) {
         // on each iteration will roll up the tree one level
@@ -457,19 +490,48 @@ function os_rank(node, x, root) {
 }
 
 
-var root = new Tree(1, undefined, undefined, undefined, 'b');
-root = insert(root, new Tree(3));
-root = insert(root, new Tree(7));
-root = insert(root, new Tree(4));
-root = insert(root, new Tree(9));
-root = insert(root, new Tree(6));
-root = insert(root, new Tree(8));
-root = insert(root, new Tree(14));
-root = insert(root, new Tree(2));
-root = insert(root, new Tree(11));
-levelOrder(root)
+function interval_search(tree, i) {
+    var x = tree;
+    while (x.getData() !== undefined) {
+        if (x.left() !== undefined && Math.max(x.left.getData()) >= Math.min(i)) {
+            x = x.left()
+        } else {
+            x = x.right()
+        }
+    }
+    return x;
+}
 
-root = del(root, 14); // error with 7 and 9
-levelOrder(root)
+// var root = new Tree(1, undefined, undefined, undefined, 'b');
+// root = insert(root, new Tree(3));
+// root = insert(root, new Tree(7));
+// root = insert(root, new Tree(4));
+// root = insert(root, new Tree(9));
+// root = insert(root, new Tree(6));
+// root = insert(root, new Tree(8));
+// root = insert(root, new Tree(14));
+// root = insert(root, new Tree(2));
+// root = insert(root, new Tree(11));
+// // levelOrder(root)
 
-console.log();
+// root = del(root, 14); // error with 7 and 9
+// // levelOrder(root)
+
+// // will print the node at the 4th index
+// console.log(os_select(root, 5).getData());
+// var node = os_select(root, 5);
+// // will return 6 as this is the node at the 5th index
+// console.log(node.getData());
+
+
+var int_root = new Tree([19,20], undefined, undefined, undefined, 'b');
+int_root = insert_int(int_root, new Tree([5,8]));
+int_root = insert_int(int_root, new Tree([25,30]));
+int_root = insert_int(int_root, new Tree([16,21]));
+int_root = insert_int(int_root, new Tree([26,26]));
+int_root = insert_int(int_root, new Tree([0,3]));
+int_root = insert_int(int_root, new Tree([6,10]));
+levelOrder(int_root);
+int_root = insert_int(int_root, new Tree([15,23]));
+int_root = insert_int(int_root, new Tree([8,9]));
+levelOrder(int_root);
