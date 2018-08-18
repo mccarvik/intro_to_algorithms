@@ -34,6 +34,16 @@ exports.Linked_List = function(){
         }
         this.size -= 1;
     }
+    
+    this.printList = function() {
+        var lis = []
+        var n = this.head;
+        while (n !== null && n !== undefined) {
+            lis.push(n.data)
+            n = n.nextNode;
+        }
+        console.log(lis);
+    }
 }
 
 

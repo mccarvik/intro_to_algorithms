@@ -64,7 +64,8 @@ function DFS(G) {
     var color = {};
     var prev = {};
     var dist = {};
-    var fins = {}
+    var fins = {};
+    var topo_order = new lists.Linked_List();
     // setup
     for (var i=0; i < G[0].length; i++) {
         var u = G[0][i];
@@ -74,6 +75,7 @@ function DFS(G) {
     var t = 0
     
     function dfs_visit(u) {
+        var scc = [u]
         color[u] = 'g';
         t += 1;
         dist[u] = t;
@@ -81,27 +83,109 @@ function DFS(G) {
             var v = G[1][u][i];
             if (color[v] == 'w') {
                 prev[v] = u;
-                dfs_visit(v);
+                scc.push(dfs_visit(v));
+                // console.log("IN LOOP");
+                // console.log(scc);
             }
         }
         color[u] = 'b';
+        topo_order.insert(u);
         t += 1;
         fins[u] = t;
+        scc = [].concat.apply([], scc);
+        return scc;
     }
     
+    var scc = []
     for (var i=0; i < G[0].length; i++) {
         var u = G[0][i];
         if (color[u] == 'w') {
-            dfs_visit(u);
+            scc.push(dfs_visit(u));
         }
     }
-    console.log("dists:")
-    console.log(dist);
-    console.log("prevs:")
-    console.log(prev);
-    console.log("fins:")
-    console.log(fins);
+    
+    // console.log("dists:")
+    // console.log(dist);
+    // console.log("prevs:")
+    // console.log(prev);
+    // console.log("finished:")
+    // console.log(fins);
+    // console.log("Topoogical Sort:");
+    // topo_order.printList();
+    var rets = {};
+    rets.fins = fins;
+    rets.prev = prev;
+    rets.scc = scc;
+    return rets;
 }
+
+
+function transposeGraph(G) {
+    var G_T = [];
+    G_T[0] = G[0];
+    var dict = {};
+    G_T[1] = {};
+    // create empty list for each vertex
+    for (var i=0; i < G[0].length; i++) {
+        dict[G[0][i]] = [];
+        // G_T[1][G[0][i]] = []
+    }
+
+    for (var i=0; i < G[0].length; i++) {
+        var u = G[0][i];
+        var lis = G[1][u];
+        for (var j=0; j < lis.length; j++) {
+            var v = lis[j];
+            dict[v].push(u);
+        }
+    }
+    G_T[1] = dict;
+    return G_T;
+}
+
+
+function DFS_strongly_connected(G) {
+    var fins = DFS(G).fins;
+    
+    // Transpose Graph
+    var G_T = transposeGraph(G);
+    
+    // consider vertices in decreasing order of fins
+    // Create items array
+    var items = Object.keys(fins).map(function(key) {
+        return [key, fins[key]];
+    });
+    // Sort the array based on the second element
+    items.sort(function(first, second) {
+      return second[1] - first[1];
+    });
+    var new_vertex_order = []
+    for (var i=0; i < items.length; i++) {
+        new_vertex_order.push(items[i][0]);
+    }
+    G_T[0] = new_vertex_order;
+    
+    var rets = DFS(G_T);
+    console.log(rets.scc);
+    
+}
+
+
+// strongly connected graph
+var G_scc = [
+    ['c', 'b', 'a', 'd', 'e', 'f', 'g', 'h'],
+    {
+        a : ['b'],
+        b : ['e', 'f'],
+        c : ['g', 'd'],
+        d : ['c', 'h'],
+        e : ['a'],
+        f : ['g'],
+        g : ['f', 'h'],
+        h : ['h']
+    }
+];
+
 
 // undirected graph
 var G = [
@@ -131,5 +215,23 @@ var G2 = [
     }
 ];
 
+// DAG -> directed acyclic graph
+var dressed  = [
+    ['shirt', 'watch', 'undershorts', 'socks', 'shoes', 'pants', 'tie', 'belt', 'jacket'],
+    {
+        shirt : ['tie', 'belt'],
+        watch : [],
+        tie : ['jacket'],
+        undershorts : ['pants', 'shoes'],
+        socks : ['shoes'],
+        pants : ['belt', 'shoes'],
+        belt : ['jacket'],
+        jacket : [],
+        shoes : [],
+    }
+];
+
 // BFS(G, 's');
-DFS(G2, 's');
+// DFS(G2, 's');
+// DFS(dressed);
+DFS_strongly_connected(G_scc);
