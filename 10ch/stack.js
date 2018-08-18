@@ -79,8 +79,8 @@ exports.Queue = function() {
         this.first = node;
     } else {
         var n = this.first;
-        while (n.nextNode) {
-            n = n.nextNode;
+        while (n.next) {
+            n = n.next;
         }
         n.next = node;
     }
@@ -96,10 +96,21 @@ exports.Queue = function() {
     return temp;
   };
   
+  this.printList = function() {
+      var lis = []
+      var n = this.first;
+      while (n !== null && n !== undefined) {
+          lis.push(n.data)
+          n = n.next;
+          
+      }
+      console.log(lis);
+  }
+  
 };
 
 var Node = function(data) {
     this.data = data;
-    this.nextNode = null;
-    this.prevNode = null;
+    this.next = null;
+    this.prev = null;
 }
