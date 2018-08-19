@@ -1,4 +1,6 @@
 function prim(G, s) {
+    // From s grows the tree adding the closest vertex to s
+    // then repeats the process with the closest vertext to any vertex in the constructed tree
     var sum = 0;
     var dists = {};
     var prev = {};

@@ -43,6 +43,7 @@ exports.Linked_List = function(){
             n = n.nextNode;
         }
         console.log(lis);
+        return lis;
     }
 }
 
