@@ -129,23 +129,6 @@ function kruskal(G, heap) {
 }
 
 
-function prim(G, heap, s) {
-    var keys = {};
-    var prev = {};
-    // Set all the keys to dist infinity and prev null
-    for (var i=0; i < Array.from(G.vertices).length; i++) {
-        var u = Array.from(G.vertices)[i];
-        keys[u] = Math.Infinity;
-        prev[u] = null;
-    }
-    
-    var Q = Array.from(G.vertices);
-    keys[s] = 0;
-    while(Q.length > 0) {
-        var mn = Math.min.apply(null, Q);
-}
-
-
 
 // Graph
 var G = {
