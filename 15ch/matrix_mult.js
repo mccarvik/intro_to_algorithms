@@ -45,6 +45,29 @@ function matrix_chain_order(p) {
 }
 
 
+// very inefficient
+function matrix_recursive_wrapper(p, i, j) {
+    // inner function calculates each sub problem
+    function matrix_chain_order_recursive(p, i, j) {
+        if (i == j) {
+            return 0;
+        }
+        m[i][j] = Number.POSITIVE_INFINITY;
+        for (var k=i; k<j; k++) {
+            var q = matrix_chain_order_recursive(p, i, k) + matrix_chain_order_recursive(p, k+1, j) + p[i-1]*p[k]*p[j];
+            if (q < m[i][j]) {
+                m[i][j] = q;
+            }
+        }
+        return m[i][j];
+    }
+    var n = p.length - 1;
+    var m = zeros([n, n]);
+    var ret = matrix_chain_order_recursive(p, i, j);
+    return ret;
+}
+
+
 function print_optimal_parens(s, i, j) {
     if (i === j) {
         process.stdout.write("A" + String(i));
@@ -71,3 +94,6 @@ console.log(matrix_multiply(A, B));
 
 var p = [30, 35, 15, 5, 10, 20, 25];
 console.log(matrix_chain_order(p));
+
+// does not use solutions to sub porblems previously found, much slower
+console.log(matrix_recursive_wrapper(p, 3, 4));
