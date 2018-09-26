@@ -68,6 +68,39 @@ function matrix_recursive_wrapper(p, i, j) {
 }
 
 
+function memoized_matriz_chain(p) {
+    var n = p.length - 1;
+    var m = zeros([n, n]);
+    for (var i=0; i<n; i++) {
+        for (var j=0; j<n; j++) {
+            m[i][j] = Number.POSITIVE_INFINITY;
+        }
+    }
+    lookup_chain(m, p, 0, n-1);
+    return m;
+}
+
+// Will lookup to see if the sub problem has been solved previously
+function lookup_chain(m, p, i, j) {
+    if (m[i][j] < Number.POSITIVE_INFINITY) {
+        return m[i][j];
+    }
+    
+    if (i == j) {
+        m[i][j] = 0;
+    } else {
+        for (var k=i; k<j; k++) {
+            var q = lookup_chain(m, p, i, k) + lookup_chain(m, p, k+1, j) + p[i]*p[k+1]*p[j+1];
+            if (q < m[i][j]) {
+                m[i][j] = q;
+            }
+        }
+    }
+    return m[i][j];
+}
+
+
+
 function print_optimal_parens(s, i, j) {
     if (i === j) {
         process.stdout.write("A" + String(i));
@@ -88,6 +121,7 @@ function zeros(dims) {
     return array;
 }
 
+
 var A = [[3], [2]];
 var B = [[4, 1, 5]];
 console.log(matrix_multiply(A, B));
@@ -97,3 +131,6 @@ console.log(matrix_chain_order(p));
 
 // does not use solutions to sub porblems previously found, much slower
 console.log(matrix_recursive_wrapper(p, 3, 4));
+
+// memoized version where previous solutions are saved
+console.log(memoized_matriz_chain(p))
