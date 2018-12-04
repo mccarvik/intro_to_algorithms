@@ -1,5 +1,6 @@
 
 // will create an optimal BST when different nodes are requested more often
+// dynamica programming 
 function optimal_bst(p, q, n) {
     var e = zeros([n+1, n]);
     var w = zeros([n+1, n]);
