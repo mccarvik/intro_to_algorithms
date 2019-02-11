@@ -36,7 +36,15 @@ class BTree(object):
         """
         Inserts a node into a tree
         """
-        pass
+        if self.n == (2 * SPLIT_T - 1):
+            pass
+        else:
+            self.insert_nonfull(k)
+    
+    def insert_nonfull(self, k):
+        i = self.n
+        if i.leaf:
+            pass
 
 
 if __name__ == '__main__':
