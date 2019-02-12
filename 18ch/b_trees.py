@@ -2,50 +2,94 @@
 script to simulate B-Tree algorithms
 """
 
-# sets the static value of t to split on
-SPLIT_T = 4
+
+class BTreeNode(object):
+    """A B-Tree Node.
+    
+    attributes
+    =====================
+    leaf : boolean, determines whether this node is a leaf.
+    keys : list, a list of keys internal to this node
+    c : list, a list of children of this node
+    """
+    def __init__(self, leaf=False):
+        self.leaf = leaf
+        self.keys = []
+        self.c    = []
+        
+    def __str__(self):
+        if self.leaf:
+            return "Leaf BTreeNode with {0} keys\n\tK:{1}\n\tC:{2}\n".format(len(self.keys), self.keys, self.c)
+        else:
+            return "Internal BTreeNode with {0} keys, {1} children\n\tK:{2}\n\n".format(len(self.keys), len(self.c), self.keys, self.c)
+
 
 class BTree(object):
-    """
-    class to represent a b_tree
-    """
-    def __init__(self):
-        """
-        Constructor
-        """
-        self.leaf = True
-        self.n = 0
-        self.val = None
-        self.chd = []
-
-    def search(self, x, k):
-        """
-        Function to search trhough B-Tree
-        """
-        pass
-
-    def split_child(self, x, i):
-        """
-        Splits the node x, on the ith child
-        """
-        z = BTree()
-        y = x.chd[i]
-        z.leaf = y.leaf
-  
+    def __init__(self, t):
+        self.root = BTreeNode(leaf=True)
+        self.t    = t
+        
     def insert(self, k):
-        """
-        Inserts a node into a tree
-        """
-        if self.n == (2 * SPLIT_T - 1):
-            pass
+        r = self.root
+        if len(r.keys) == (2*self.t) - 1:     # keys are full, so we must split
+            s = BTreeNode()
+            # set root to new node
+            self.root = s
+            # former root is now 0th child of new root s
+            s.c.insert(0, r) 
+            self._split_child(s, 0)
+            # Now room in tree insert node
+            self._insert_nonfull(s, k)
         else:
-            self.insert_nonfull(k)
+            # if tree isn't full just add node
+            self._insert_nonfull(r, k)
     
-    def insert_nonfull(self, k):
-        i = self.n
-        if i.leaf:
-            pass
+    def _insert_nonfull(self, x, k):
+        i = len(x.keys) - 1
+        if x.leaf:
+            # if x is a leaf, insert k into x
+            x.keys.append(0)
+            while i >= 0 and k < x.keys[i]:
+                x.keys[i+1] = x.keys[i]
+                i -= 1
+            x.keys[i+1] = k
+        else:
+            # determines the child to conitnue the recursion
+            while i >= 0 and k < x.keys[i]:
+                i -= 1
+            i += 1
+            # determines would descend to a full child then need to split
+            if len(x.c[i].keys) == (2*self.t) - 1:
+                self._split_child(x, i)
+                if k > x.keys[i]:
+                    i += 1
+            # Recurse through again in appropriate sub tree
+            self._insert_nonfull(x.c[i], k)    
 
+    def _split_child(self, x, i):
+        # x node to be split
+        t = self.t
+        # y is x's ith child
+        y = x.c[i]
+        z = BTreeNode(leaf=y.leaf)
+        
+        # slide all children of x to the right and insert z at i+1.
+        x.c.insert(i+1, z)
+        x.keys.insert(i, y.keys[t-1])
+        
+        # keys of z are t to 2t - 1,
+        # y is then 0 to t-2
+        z.keys = y.keys[t:(2*t - 1)]
+        y.keys = y.keys[0:(t-1)]
+        
+        # children of z are t to 2t els of y.c
+        if not y.leaf:
+            z.c = y.c[t:(2*t)]
+            y.c = y.c[0:(t-1)]    
+        
+    def __str__(self):
+        r = self.root
+        return r.__str__() + '\n'.join([child.__str__() for child in r.c])  
 
 if __name__ == '__main__':
     ROOT = BTree()
