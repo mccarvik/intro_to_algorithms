@@ -38,6 +38,7 @@ class BTree(object):
         """
         Insert a value k into the B-Tree
         """
+        pdb.set_trace()
         r = self.root
         if len(r.keys) == (2*self.t) - 1:     # keys are full, so we must split
             s = BTreeNode()
@@ -53,6 +54,7 @@ class BTree(object):
             self._insert_nonfull(r, k)
 
     def _insert_nonfull(self, x, k):
+        pdb.set_trace()
         i = len(x.keys) - 1
         if x.leaf:
             # if x is a leaf, insert k into x
@@ -75,6 +77,7 @@ class BTree(object):
             self._insert_nonfull(x.c[i], k)
 
     def _split_child(self, x, i):
+        pdb.set_trace()
         # x node to be split
         t = self.t
         # y is x's ith child
@@ -109,7 +112,6 @@ class BTree(object):
 
         """
         if isinstance(x, BTreeNode):
-            pdb.set_trace()
             i = 0
             while i < len(x.keys) and k > x.keys[i]:    # look for index of k
                 i += 1
@@ -138,7 +140,10 @@ if __name__ == '__main__':
     ROOT.insert('H')
     ROOT.insert('I')
     ROOT.insert('J')
+    ROOT.insert('K')
+    ROOT.insert('L')
+    
 
     # search feature
-    ROOT.search('G')
+    # ROOT.search('G')
     print(ROOT)
